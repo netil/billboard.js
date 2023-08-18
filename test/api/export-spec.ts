@@ -215,9 +215,9 @@ describe.only("API export", () => {
 
 			// pattern for CI: preserveFontStyle=true
 			[
-				"YiAZcJUAC6nB361jECvOF1DD0HdpA",
-				"S6iAoAFtNmParEdAFM18H03Uf1P9ktbatrndeA",
-				"ZczoCtPNG8bDXXwJxMJ+4mpIHPBqrpwHz9sXAb"
+				"4U0OAAjDiVKvfuQsCnLC2WblfcoXb1MeG0MxJUOwFwMDoI1ghV8nCgt0UG83WRxx",
+				"AKOiTTutIKA9XRdAgo0QBNe1wn41m04KQJg3wOB86SvuWs1/1pMACaxNoF4Bu",
+				"H8wWyLdFr4gZWYBnbtoAO2SzOhhNr41l9l0NbArPEZDAiSQQAJmLWYTg"
 			]
 		];
 
@@ -253,15 +253,13 @@ describe.only("API export", () => {
 				chart.export({
 					preserveFontStyle: true
 				}, function(dataUrl) {
-					console.log(dataUrl)
+					expect(
+						expected.some(pttr => pttr.every(v => dataUrl.indexOf(v) >= 0))
+					).to.be.true;
 
-					// expect(
-					// 	expected.some(pttr => pttr.every(v => dataUrl.indexOf(v) >= 0))
-					// ).to.be.true;
-
-					// chart.$.chart
-					// 	.style("margin-left", null)
-					// 	.style("padding-top", null);
+					chart.$.chart
+						.style("margin-left", null)
+						.style("padding-top", null);
 
 					done();
 				});
