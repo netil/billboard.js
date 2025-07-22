@@ -426,7 +426,21 @@ export default {
 	 *     },
 	 *
 	 * 	   // rotate degree for label text
-	 *     rotate: 90
+	 *     rotate: 90,
+	 *
+	 *     // add border to data label text
+	 *     border: true,
+	 *
+	 *     // or set detailed border options
+	 *     border: {
+	 *        padding: {
+	 *           top: 10,
+	 *           bottom: 10,
+	 *           left: 10,
+	 *           right: 10
+	 *        },
+	 *        radius: 10
+	 *     }
 	 *   }
 	 * }
 	 */
@@ -438,7 +452,16 @@ export default {
 			| number
 			| {[key: string]: number}
 			| {[key: string]: {x?: number, y?: number}},
-		rotate?: number
+		rotate?: number,
+		border?: boolean | {
+			padding?: {
+				top?: number,
+				bottom?: number,
+				left?: number,
+				right?: number
+			},
+			radius?: number
+		}
 	}>{},
 	data_labels_backgroundColors: <string | {[key: string]: string} | undefined>undefined,
 	data_labels_colors: <string | object | Function | undefined>undefined,

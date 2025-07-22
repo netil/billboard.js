@@ -1219,6 +1219,42 @@ export interface Data {
 		 * Rotate label text. Specify degree value in a range of `0 ~ 360`.
 		 */
 		rotate?: number;
+
+		/**
+		 * Add border to data label text.
+		 * Can be boolean for default styling or object for custom styling.
+		 */
+		border?: boolean | {
+			/**
+			 * Border padding configuration
+			 */
+			padding?: {
+				/**
+				 * Top padding
+				 */
+				top?: number;
+
+				/**
+				 * Bottom padding  
+				 */
+				bottom?: number;
+
+				/**
+				 * Left padding
+				 */
+				left?: number;
+
+				/**
+				 * Right padding
+				 */
+				right?: number;
+			};
+
+			/**
+			 * Border radius
+			 */
+			radius?: number;
+		};
 	};
 
 	/**

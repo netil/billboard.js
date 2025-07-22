@@ -9,8 +9,10 @@ import {KEY} from "../../module/Cache";
 import {
 	capitalize,
 	getBoundingRect,
+	getBBox,
 	getRandom,
 	getTranslation,
+	isBoolean,
 	isFunction,
 	isNumber,
 	isObject,
@@ -116,6 +118,81 @@ function getTextPos(d, type): number {
 			position.bind(this.api)(type, value, id, index, this.$el.text) :
 			(id in position ? position[id] : position)[type]
 	) ?? 0;
+}
+
+/**
+ * Add or update border around text labels
+ * @param {d3Selection} textSelection Text elements selection
+ * @private
+ */
+function addTextBorder(textSelection: d3Selection): void {
+	const $$ = this;
+	const {config, state: {hiddenTargetIds}} = $$;
+	const {border} = config.data_labels;
+	
+	if (!border) {
+		return;
+	}
+
+	// Default border config
+	const defaultConfig = {
+		padding: {
+			top: 3,
+			bottom: 3,
+			left: 5,
+			right: 5
+		},
+		radius: 8,
+		color: "#000"
+	};
+
+	// Merge with user config
+	const borderConfig = isBoolean(border) ? defaultConfig : {
+		padding: {
+			...defaultConfig.padding,
+			...(border.padding || {})
+		},
+		radius: border.radius ?? defaultConfig.radius,
+		color: border.color ?? defaultConfig.color
+	};
+
+	const {padding, radius} = borderConfig;
+	const parent = {};
+
+	textSelection
+		.filter(({id}) => {
+			if (!parent[id]) {
+				parent[id] = $$.$el.main.select(`.bb-texts-${id}`);
+			}
+
+			return !hiddenTargetIds.includes(id);
+		})
+		.each(function(d, i) {
+			const parentNode = parent[d.id];
+
+			if (!parentNode.empty()) {
+				const bbox = getBBox(this, true);
+				const rectClass = `text-border-rect-${$$.getTargetSelectorSuffix(d.id)}-${i}`;
+				let border = parentNode.select(`.${rectClass}`);
+
+				if (border.empty()) {
+					border = parentNode.insert("rect", () => this)
+						.attr("class", rectClass)
+						.style("fill", "none")
+						.style("stroke", borderConfig.color)
+						// .style("stroke", "#000")
+						// .style("stroke-width", "1px");
+				}
+
+				border
+					.attr("rx", radius)
+					.attr("ry", radius)
+					.attr("x", bbox.x - (padding.left || padding.right || 0))
+					.attr("y", bbox.y - (padding.top || padding.bottom || 0))
+					.attr("width", bbox.width + (padding.left || 0) + (padding.right || 0))
+					.attr("height", bbox.height + (padding.top || 0) + (padding.bottom || 0));
+			}
+		});
 }
 
 export default {
@@ -234,6 +311,9 @@ export default {
 					setTextValue(node, value);
 				}
 			});
+
+		// Add border to text labels if enabled
+		addTextBorder.call($$, $el.text);
 	},
 
 	updateTextColor(d): null | object | string {
@@ -340,6 +420,9 @@ export default {
 					node.attr("x", pos.x).attr("y", pos.y);
 				}
 			});
+
+		// Add border to text labels if enabled  
+		addTextBorder.call($$, $$.$el.text);
 
 		// need to return 'true' as of being pushed to the redraw list
 		// ref: getRedrawList()
