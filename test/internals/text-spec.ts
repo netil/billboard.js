@@ -1854,6 +1854,93 @@ describe("TEXT", () => {
 					expect(true).to.be.true; // Placeholder - the main logic is tested by not crashing
 				});
 			});
+
+			it("set options: data.labels.border with shorthand padding", () => {
+				args.data.labels.border = {
+					padding: 10,
+					radius: 5
+				};
+			});
+
+			it("should apply shorthand padding (single value)", () => {
+				chart.$.text.texts.each(function(d, i) {
+					const parent = chart.$.main.select(`.bb-texts-${d.id}`);
+					const borderRect = parent.select(`.text-border-rect-${chart.getTargetSelectorSuffix(d.id)}-${i}`);
+					const textBBox = this.getBBox();
+					
+					expect(borderRect.empty()).to.be.false;
+					expect(borderRect.attr("rx")).to.equal("5");
+					
+					// Check that all sides have 10px padding
+					const rectX = +borderRect.attr("x");
+					const rectY = +borderRect.attr("y");
+					const rectWidth = +borderRect.attr("width");
+					const rectHeight = +borderRect.attr("height");
+					
+					expect(rectX).to.equal(textBBox.x - 10); // left padding
+					expect(rectY).to.equal(textBBox.y - 10); // top padding
+					expect(rectWidth).to.equal(textBBox.width + 20); // left + right padding
+					expect(rectHeight).to.equal(textBBox.height + 20); // top + bottom padding
+				});
+			});
+
+			it("set options: data.labels.border with shorthand padding (2 values)", () => {
+				args.data.labels.border = {
+					padding: "15 8",
+					radius: 6
+				};
+			});
+
+			it("should apply shorthand padding (2 values)", () => {
+				chart.$.text.texts.each(function(d, i) {
+					const parent = chart.$.main.select(`.bb-texts-${d.id}`);
+					const borderRect = parent.select(`.text-border-rect-${chart.getTargetSelectorSuffix(d.id)}-${i}`);
+					const textBBox = this.getBBox();
+					
+					expect(borderRect.empty()).to.be.false;
+					expect(borderRect.attr("rx")).to.equal("6");
+					
+					// Check that top/bottom: 15, left/right: 8
+					const rectX = +borderRect.attr("x");
+					const rectY = +borderRect.attr("y");
+					const rectWidth = +borderRect.attr("width");
+					const rectHeight = +borderRect.attr("height");
+					
+					expect(rectX).to.equal(textBBox.x - 8); // left padding
+					expect(rectY).to.equal(textBBox.y - 15); // top padding
+					expect(rectWidth).to.equal(textBBox.width + 16); // left + right padding (8 + 8)
+					expect(rectHeight).to.equal(textBBox.height + 30); // top + bottom padding (15 + 15)
+				});
+			});
+
+			it("set options: data.labels.border with shorthand padding (4 values)", () => {
+				args.data.labels.border = {
+					padding: "10 5 15 8",
+					radius: 4
+				};
+			});
+
+			it("should apply shorthand padding (4 values)", () => {
+				chart.$.text.texts.each(function(d, i) {
+					const parent = chart.$.main.select(`.bb-texts-${d.id}`);
+					const borderRect = parent.select(`.text-border-rect-${chart.getTargetSelectorSuffix(d.id)}-${i}`);
+					const textBBox = this.getBBox();
+					
+					expect(borderRect.empty()).to.be.false;
+					expect(borderRect.attr("rx")).to.equal("4");
+					
+					// Check that top: 10, right: 5, bottom: 15, left: 8
+					const rectX = +borderRect.attr("x");
+					const rectY = +borderRect.attr("y");
+					const rectWidth = +borderRect.attr("width");
+					const rectHeight = +borderRect.attr("height");
+					
+					expect(rectX).to.equal(textBBox.x - 8); // left padding
+					expect(rectY).to.equal(textBBox.y - 10); // top padding
+					expect(rectWidth).to.equal(textBBox.width + 13); // left + right padding (8 + 5)
+					expect(rectHeight).to.equal(textBBox.height + 25); // top + bottom padding (10 + 15)
+				});
+			});
 		});
 	});
 });

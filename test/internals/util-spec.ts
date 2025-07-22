@@ -8,7 +8,7 @@ import {describe, expect, it} from "vitest";
 import sinon from "sinon";
 import {timeParse as d3TimeParse} from "d3-time-format";
 import {window} from "../../src/module/browser";
-import {toArray, getBoundingRect, getCssRules, getPathBox, getPointer, getUnique, isArray, isNumber, sortValue, parseDate} from "../assets/module/util";
+import {toArray, getBoundingRect, getCssRules, getPathBox, getPointer, getUnique, isArray, isNumber, sortValue, parseDate, parsePadding} from "../assets/module/util";
 
 describe("UTIL", function() {
 	describe("toArray", () => {
@@ -207,6 +207,117 @@ describe("UTIL", function() {
 
 			// rollback
 			window.console = console;
+		});
+	});
+
+	describe("parsePadding", () => {
+		it("should parse single value", () => {
+			const result = parsePadding(10);
+			
+			expect(result).to.deep.equal({
+				top: 10,
+				right: 10,
+				bottom: 10,
+				left: 10
+			});
+		});
+
+		it("should parse two values string", () => {
+			const result = parsePadding("15 8");
+			
+			expect(result).to.deep.equal({
+				top: 15,
+				right: 8,
+				bottom: 15,
+				left: 8
+			});
+		});
+
+		it("should parse three values string", () => {
+			const result = parsePadding("10 5 20");
+			
+			expect(result).to.deep.equal({
+				top: 10,
+				right: 5,
+				bottom: 20,
+				left: 5
+			});
+		});
+
+		it("should parse four values string", () => {
+			const result = parsePadding("10 5 15 8");
+			
+			expect(result).to.deep.equal({
+				top: 10,
+				right: 5,
+				bottom: 15,
+				left: 8
+			});
+		});
+
+		it("should handle object input", () => {
+			const input = {
+				top: 12,
+				right: 6,
+				bottom: 18,
+				left: 9
+			};
+			const result = parsePadding(input);
+			
+			expect(result).to.deep.equal({
+				top: 12,
+				right: 6,
+				bottom: 18,
+				left: 9
+			});
+		});
+
+		it("should handle partial object input", () => {
+			const input = {
+				top: 12,
+				left: 9
+			};
+			const result = parsePadding(input);
+			
+			expect(result).to.deep.equal({
+				top: 12,
+				right: 0,
+				bottom: 0,
+				left: 9
+			});
+		});
+
+		it("should handle empty object input", () => {
+			const result = parsePadding({});
+			
+			expect(result).to.deep.equal({
+				top: 0,
+				right: 0,
+				bottom: 0,
+				left: 0
+			});
+		});
+
+		it("should handle invalid input", () => {
+			const result = parsePadding("invalid input with too many values 1 2 3 4 5");
+			
+			expect(result).to.deep.equal({
+				top: 0,
+				right: 0,
+				bottom: 0,
+				left: 0
+			});
+		});
+
+		it("should handle whitespace in string input", () => {
+			const result = parsePadding("  10   5  ");
+			
+			expect(result).to.deep.equal({
+				top: 10,
+				right: 5,
+				bottom: 10,
+				left: 5
+			});
 		});
 	});
 });

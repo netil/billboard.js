@@ -8,8 +8,8 @@ import {$COMMON, $TEXT} from "../../config/classes";
 import {KEY} from "../../module/Cache";
 import {
 	capitalize,
-	getBoundingRect,
 	getBBox,
+	getBoundingRect,
 	getRandom,
 	getTranslation,
 	isBoolean,
@@ -17,6 +17,7 @@ import {
 	isNumber,
 	isObject,
 	isString,
+	parsePadding,
 	setTextValue
 } from "../../module/util";
 import type {IArcData, IDataRow} from "../data/IData";
@@ -129,7 +130,7 @@ function addTextBorder(textSelection: d3Selection): void {
 	const $$ = this;
 	const {config, state: {hiddenTargetIds}} = $$;
 	const {border} = config.data_labels;
-	
+
 	if (!border) {
 		return;
 	}
@@ -146,12 +147,23 @@ function addTextBorder(textSelection: d3Selection): void {
 		color: "#000"
 	};
 
+	// Parse padding shorthand if needed
+	let parsedPadding;
+	if (isBoolean(border)) {
+		parsedPadding = defaultConfig.padding;
+	} else {
+		if (border.padding) {
+			// Parse shorthand to individual values
+			parsedPadding = parsePadding(border.padding);
+		} else {
+			// Use default padding
+			parsedPadding = defaultConfig.padding;
+		}
+	}
+
 	// Merge with user config
 	const borderConfig = isBoolean(border) ? defaultConfig : {
-		padding: {
-			...defaultConfig.padding,
-			...(border.padding || {})
-		},
+		padding: parsedPadding,
 		radius: border.radius ?? defaultConfig.radius,
 		color: border.color ?? defaultConfig.color
 	};
@@ -179,18 +191,18 @@ function addTextBorder(textSelection: d3Selection): void {
 					border = parentNode.insert("rect", () => this)
 						.attr("class", rectClass)
 						.style("fill", "none")
-						.style("stroke", borderConfig.color)
-						// .style("stroke", "#000")
-						// .style("stroke-width", "1px");
+						.style("stroke", borderConfig.color);
+					// .style("stroke", "#000")
+					// .style("stroke-width", "1px");
 				}
 
 				border
 					.attr("rx", radius)
 					.attr("ry", radius)
-					.attr("x", bbox.x - (padding.left || padding.right || 0))
-					.attr("y", bbox.y - (padding.top || padding.bottom || 0))
-					.attr("width", bbox.width + (padding.left || 0) + (padding.right || 0))
-					.attr("height", bbox.height + (padding.top || 0) + (padding.bottom || 0));
+					.attr("x", bbox.x - padding.left)
+					.attr("y", bbox.y - padding.top)
+					.attr("width", bbox.width + padding.left + padding.right)
+					.attr("height", bbox.height + padding.top + padding.bottom);
 			}
 		});
 }
@@ -421,7 +433,7 @@ export default {
 				}
 			});
 
-		// Add border to text labels if enabled  
+		// Add border to text labels if enabled
 		addTextBorder.call($$, $$.$el.text);
 
 		// need to return 'true' as of being pushed to the redraw list

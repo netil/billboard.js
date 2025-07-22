@@ -454,12 +454,7 @@ export default {
 			| {[key: string]: {x?: number, y?: number}},
 		rotate?: number,
 		border?: boolean | {
-			padding?: {
-				top?: number,
-				bottom?: number,
-				left?: number,
-				right?: number
-			},
+			padding?: number | string | {top?: number, bottom?: number, left?: number, right?: number},
 			radius?: number
 		}
 	}>{},

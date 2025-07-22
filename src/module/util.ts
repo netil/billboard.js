@@ -57,6 +57,7 @@ export {
 	mergeObj,
 	notEmpty,
 	parseDate,
+	parsePadding,
 	runUntil,
 	sanitize,
 	setTextValue,
@@ -272,7 +273,7 @@ function getPathBox(
  * @returns {Array} [x, y] Coordinates x, y array
  * @private
  */
-function getPointer(event, element?: SVGElement): number[] {
+function getPointer(event, element?: SVGElement | HTMLElement): number[] {
 	const touches = event &&
 		(event.touches || (event.sourceEvent && event.sourceEvent.touches))?.[0];
 	let pointer = [0, 0];
@@ -942,5 +943,73 @@ function runUntil(fn: Function, conditionFn: Function): void {
 		requestAnimationFrame(() => runUntil(fn, conditionFn));
 	} else {
 		fn();
+	}
+}
+
+/**
+ * Parse CSS-style padding shorthand values
+ * @param {number|string|object} padding Padding value(s)
+ * @returns {object} Parsed padding object with top, right, bottom, left properties
+ * @private
+ */
+function parsePadding(padding: number | string | {top?: number, right?: number, bottom?: number, left?: number}): {top: number, right: number, bottom: number, left: number} {
+	// If already an object with individual values, return as is (with defaults)
+	if (isObject(padding) && !isString(padding)) {
+		const paddingObj = padding as {top?: number, right?: number, bottom?: number, left?: number};
+		return {
+			top: paddingObj.top || 0,
+			right: paddingObj.right || 0,
+			bottom: paddingObj.bottom || 0,
+			left: paddingObj.left || 0
+		};
+	}
+
+	// Convert to string and parse
+	const values = isString(padding) ? 
+		padding.trim().split(/\s+/).map(v => parseFloat(v)) :
+		[padding as number];
+
+	// Handle different number of values like CSS
+	switch (values.length) {
+		case 1:
+			// padding: 10 -> all sides
+			return {
+				top: values[0],
+				right: values[0],
+				bottom: values[0],
+				left: values[0]
+			};
+		case 2:
+			// padding: "10 5" -> top/bottom: 10, left/right: 5
+			return {
+				top: values[0],
+				right: values[1],
+				bottom: values[0],
+				left: values[1]
+			};
+		case 3:
+			// padding: "10 5 15" -> top: 10, left/right: 5, bottom: 15
+			return {
+				top: values[0],
+				right: values[1],
+				bottom: values[2],
+				left: values[1]
+			};
+		case 4:
+			// padding: "10 5 15 3" -> top: 10, right: 5, bottom: 15, left: 3
+			return {
+				top: values[0],
+				right: values[1],
+				bottom: values[2],
+				left: values[3]
+			};
+		default:
+			// Invalid input, return all zeros
+			return {
+				top: 0,
+				right: 0,
+				bottom: 0,
+				left: 0
+			};
 	}
 }

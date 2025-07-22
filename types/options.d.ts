@@ -1226,9 +1226,16 @@ export interface Data {
 		 */
 		border?: boolean | {
 			/**
-			 * Border padding configuration
+			 * Border padding configuration.
+			 * Can be an object with individual properties, a number for all sides,
+			 * or a string for CSS-style shorthand notation.
+			 * Examples:
+			 * - padding: 10 (all sides)
+			 * - padding: "10 5" (top/bottom: 10, left/right: 5)
+			 * - padding: "10 5 15" (top: 10, left/right: 5, bottom: 15)
+			 * - padding: "10 5 15 3" (top: 10, right: 5, bottom: 15, left: 3)
 			 */
-			padding?: {
+			padding?: number | string | {
 				/**
 				 * Top padding
 				 */
